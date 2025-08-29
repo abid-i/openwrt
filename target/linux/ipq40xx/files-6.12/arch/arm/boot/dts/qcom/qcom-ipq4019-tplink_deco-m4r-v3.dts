@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0+ OR MIT
 
-/dts-v1/;
-
 #include "qcom-ipq4019.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
@@ -54,7 +52,6 @@
 		};
 
 		tcsr@194b000 {
-			/* select hostmode */
 			compatible = "qcom,tcsr";
 			reg = <0x194b000 0x100>;
 			qcom,usb-hsphy-mode-select = <TCSR_USB_HSPHY_HOST_MODE>;
