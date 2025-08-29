@@ -1320,21 +1320,21 @@ define Device/zyxel_wre6606
 endef
 # Missing DSA Setup
 #TARGET_DEVICES += zyxel_wre6606
-define Device/tp-link_deco-m4r-v3
+define Device/tplink_deco-m4r-v3
   $(call Device/FitImage)
   DEVICE_VENDOR := TP-Link
   DEVICE_MODEL := Deco M4R
   DEVICE_VARIANT := v3
-  DEVICE_ALT0_VENDOR := TP-Link
-  DEVICE_ALT0_MODEL := Deco M4
-  DEVICE_ALT0_VARIANT := v3
+  # DEVICE_ALT0_VENDOR := TP-Link
+  # DEVICE_ALT0_MODEL := Deco M4
+  # DEVICE_ALT0_VARIANT := v3
   BOARD_NAME := deco-m4r-v3
   SOC := qcom-ipq4019
   BLOCKSIZE := 64k
   PAGESIZE := 2048
-  DEVICE_DTS := qcom-ipq4019-tp-link-deco-m4r-v3
+  DEVICE_DTS := qcom-ipq4019-tplink_deco-m4r-v3
   DEVICE_DTS_CONFIG := config@1
-  DEVICE_PACKAGES := ipq-wifi-tp_link_deco-m4r-v3 kmod-leds-gpio
+  DEVICE_PACKAGES := ipq-wifi-tplink_deco-m4r-v3 kmod-leds-gpio
   TPLINK_BOARD_ID := DECO-M4R-V3
   KERNEL_SIZE := 3200k
   IMAGE_SIZE := 15616k
@@ -1344,5 +1344,5 @@ define Device/tp-link_deco-m4r-v3
   SUPPORTED_DEVICES += deco-m4r-v3
   TARGET_CFLAGS += -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
 endef
-TARGET_DEVICES += tp-link_deco-m4r-v3
+TARGET_DEVICES += tplink_deco-m4r-v3
 
