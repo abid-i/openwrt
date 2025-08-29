@@ -111,6 +111,10 @@ sony,ncp-hg100-cellular)
 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "wan"
 	ucidef_set_led_netdev "wwan" "WWAN" "green:wan-4" "wwan0"
 	;;
+tp-link,deco-m4r-v3)
+	ucidef_set_led_netdev "wan" "WAN" "blue:status" "wan"
+	ucidef_set_led_wlan "wlan" "WLAN" "white:status" "phy0tpt" "phy1tpt"
+	;;
 zyxel,nbg6617 |\
 zyxel,wre6606)
 	ucidef_set_led_wlan "wlan2g" "WLAN2G" "green:wlan2g" "phy0tpt"

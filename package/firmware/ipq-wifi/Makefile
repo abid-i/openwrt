@@ -5,11 +5,11 @@ PKG_NAME:=ipq-wifi
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL=$(PROJECT_GIT)/project/firmware/qca-wireless.git
+PKG_SOURCE_URL=https://github.com/abid-i/firmware_qca-wireless.git
 PKG_SOURCE_DATE:=2025-08-25
-PKG_SOURCE_VERSION:=a510502e7922b0a61e455e43479a62e7d27cf3ba
-PKG_MIRROR_HASH:=0b8120ce09fdd9176e77b65f2c0866e14aa580ba7e6dd9440f37011418346be7
-PKG_FLAGS:=nonshared
+PKG_SOURCE_VERSION:=bb0ddb0dd4704c211aa076125a365c8b96264094
+PKG_MIRROR_HASH:=skip
+# PKG_FLAGS:=nonshared
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -73,6 +73,7 @@ ALLWIFIBOARDS:= \
 	skspruce_wia3300-20 \
 	spectrum_sax1v1k \
 	tplink_deco-x80-5g \
+	tplink_deco-m4r-v3 \
 	tplink_eap610-outdoor \
 	tplink_eap620hd-v1 \
 	tplink_eap623od-hd-v1 \
@@ -243,6 +244,7 @@ $(eval $(call generate-ipq-wifi-package,redmi_ax6,Redmi AX6))
 $(eval $(call generate-ipq-wifi-package,skspruce_wia3300-20,SKSpruce WIA3300-20))
 $(eval $(call generate-ipq-wifi-package,spectrum_sax1v1k,Spectrum SAX1V1K))
 $(eval $(call generate-ipq-wifi-package,tplink_deco-x80-5g,TP-Link Deco X80-5G))
+$(eval $(call generate-ipq-wifi-package,tplink_deco-m4r-v3,TP-Link Deco M4R v3))
 $(eval $(call generate-ipq-wifi-package,tplink_eap610-outdoor,TPLink EAP610-Outdoor))
 $(eval $(call generate-ipq-wifi-package,tplink_eap620hd-v1,TP-Link EAP620 HD v1))
 $(eval $(call generate-ipq-wifi-package,tplink_eap623od-hd-v1,TP-Link EAP623-Outdoor HD v1))
