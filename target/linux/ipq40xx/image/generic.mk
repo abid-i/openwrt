@@ -1157,53 +1157,6 @@ endef
 # Missing DSA Setup
 #TARGET_DEVICES += tel_x1pro
 
-define Device/tplink_deco-m4r-v3
-  $(call Device/FitImage)
-  DEVICE_VENDOR := TP-Link
-  DEVICE_MODEL := Deco M4R
-  DEVICE_VARIANT := v3
-  BOARD_NAME := deco-m4r-v3
-  SOC := qcom-ipq4019
-  BLOCKSIZE := 64k
-  PAGESIZE := 2048
-  DEVICE_DTS := qcom-ipq4019-tplink_deco-m4r-v3
-  DEVICE_DTS_CONFIG := config@ap.dk04.1-c1
-  TPLINK_BOARD_ID := DECO-M4R-V3
-  
-  # Device-specific packages for mesh optimization
-  DEVICE_PACKAGES := \
-    -kmod-usb-dwc3-qcom \
-    -kmod-usb3 \
-    -kmod-usb-dwc3 \
-    -kmod-usb2 \
-    -kmod-usb-ohci \
-    -kmod-usb-ehci \
-    -uboot-envtools \
-    ipq-wifi-tplink_deco-m4r-v3 \
-    kmod-leds-gpio \
-    kmod-gpio-button-hotplug \
-    ath10k-firmware-qca4019 \
-    wpad-basic-mbedtls \
-    kmod-crypto-hw-qce \
-    -kmod-ath10k-ct \
-    -ath10k-firmware-qca4019-ct
-  
-  # Use slot 1 (larger partition) - verified from device logs
-  # Slot 1: 0x1020000-0x2000000 = 16.45MB vs Slot 0: 0x240000-0xf60000 = 13.125MB
-  IMAGES += factory.bin
-  IMAGE/factory.bin := tplink-safeloader
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-  IMAGE_SIZE := 16704k # Using slot 1 size (16.45MB in kilobytes)
-  
-  # Include device-specific optimizations when building this device
-  $(if $(filter $(PROFILE),tplink_deco-m4r-v3),\
-    $(eval include $(TOPDIR)/target/linux/ipq40xx/generic/tplink_deco-m4r-v3.mk))
-  
-  SUPPORTED_DEVICES += deco-m4r-v3
-endef
-TARGET_DEVICES += tplink_deco-m4r-v3
-
-
 define Device/unielec_u4019-32m
 	$(call Device/FitImage)
 	DEVICE_VENDOR := Unielec

@@ -111,9 +111,16 @@ sony,ncp-hg100-cellular)
 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "wan"
 	ucidef_set_led_netdev "wwan" "WWAN" "green:wan-4" "wwan0"
 	;;
-tp-link,deco-m4r-v3)
-	ucidef_set_led_netdev "wan" "WAN" "blue:status" "wan"
-	ucidef_set_led_wlan "wlan" "WLAN" "white:status" "phy0tpt" "phy1tpt"
+tplink,deco-m4r-v3)
+	# RGB LED configuration verified from device logs
+	# Single 4-pin RGB LED with GPIO control:
+	# GPIO36 = Red, GPIO37 = Green, GPIO38 = Blue (all active low)
+	# Configure LEDs for different system states
+	ucidef_set_led_default "power" "POWER" "rgb:blue" "1"
+	ucidef_set_led_netdev "wan" "WAN" "rgb:red" "wan" 
+	ucidef_set_led_netdev "lan" "LAN" "rgb:green" "br-lan"
+	# Additional LED trigger for mesh status
+	ucidef_set_led_netdev "mesh" "MESH" "rgb:green" "bat0"
 	;;
 zyxel,nbg6617 |\
 zyxel,wre6606)

@@ -25,7 +25,7 @@
 		 * - Slot 1: 16.45MB combined space
 		 * MTD splitter automatically detects kernel/rootfs boundary
 		 */
-		bootargs-append = " root=/dev/mtdblock12 rootfstype=squashfs rootwait clk_ignore_unused";
+     bootargs-append = " root=mtd:firmware rootfstype=squashfs rootwait clk_ignore_unused";
 	};
 
 	aliases {
@@ -352,11 +352,11 @@
 			 * 1. Kernel partition (uImage header at start of combined partition)
 			 * 2. Rootfs partition (SquashFS signature after kernel)
 			 */
-			partition@1020000 {
-				label = "firmware";
-				reg = <0x1020000 0xfe0000>; // 16.45MB combined space
-				compatible = "denx,uimage";
-			};
+      partition@1020000 {
+          label = "firmware";
+          reg = <0x1020000 0xf60000>; 
+          compatible = "openwrt,uimage", "denx,uimage";
+      };
 
 			/* Metadata partitions for slot 1 */
 			partition@2000000 {
@@ -462,4 +462,3 @@
 &usb3_ss_phy {
 	status = "disabled";
 };
-

@@ -54,8 +54,11 @@ preinit_set_mac_address() {
     ip link set dev lan4 address "$base_mac"
     ip link set dev wan address "$(macaddr_add "$base_mac" 1)"
     ;;
-  tp-link,deco-m4r-v3)
-    base_mac=$(mtd_get_mac_binary "radio" 0x0)
+  tplink,deco-m4r-v3)
+    # MAC address configuration verified from device logs
+    # Base MAC from ART partition at offset 0x0
+    # Set interface MAC addresses before network initialization
+    base_mac=$(mtd_get_mac_binary "art" 0x0)
     ip link set dev eth0 address "$base_mac"
     ip link set dev lan address "$base_mac"
     ip link set dev wan address $(macaddr_add "$base_mac" 1)

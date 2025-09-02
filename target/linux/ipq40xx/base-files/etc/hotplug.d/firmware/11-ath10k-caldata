@@ -145,9 +145,12 @@ case "$FIRMWARE" in
     caldata_extract "0:ART" 0x1000 0x2f20
     ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "0:CONFIG" 0x0) 2)
     ;;
-  tp-link,deco-m4r-v3)
-    caldata_extract "radio" 0x1000 0x2f20
-    ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "radio" 0x0) 2)
+  tplink,deco-m4r-v3)
+    # 2.4GHz radio calibration from ART partition
+    # Verified from device logs: boardData_3_0_IPQ4019_DK04_2G.bin
+    # Extract pre-calibration data and patch MAC address
+    caldata_extract "art" 0x1000 0x2f20
+    ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "art" 0x0) 2)
     ;;
   sony,ncp-hg100-cellular)
     caldata_extract_mmc "0:ART" 0x1000 0x2f20
@@ -249,9 +252,12 @@ case "$FIRMWARE" in
     caldata_extract "0:ART" 0x5000 0x2f20
     ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "0:CONFIG" 0x0) 3)
     ;;
-  tp-link,deco-m4r-v3)
-    caldata_extract "radio" 0x5000 0x2f20
-    ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "radio" 0x0) 3)
+  tplink,deco-m4r-v3)
+    # 5GHz radio calibration from ART partition
+    # Verified from device logs: boardData_3_0_IPQ4019_DK04_5G.bin
+    # Extract pre-calibration data and patch MAC address
+    caldata_extract "art" 0x5000 0x2f20
+    ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "art" 0x0) 3)
     ;;
   sony,ncp-hg100-cellular)
     caldata_extract_mmc "0:ART" 0x5000 0x2f20
