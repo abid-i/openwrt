@@ -190,20 +190,21 @@ CONFIG_SLUB=y
 CONFIG_SLAB=n
 CONFIG_SLUB_DEBUG=n
 
-# Disable all USB support
-CONFIG_USB_SUPPORT=n
-CONFIG_USB=n
-CONFIG_USB_XHCI_HCD=n
-CONFIG_USB_EHCI_HCD=n
-CONFIG_USB_OHCI_HCD=n
-CONFIG_USB_DWC3=n
-CONFIG_USB_DWC3_QCOM=n
 
 # Remove Unused Hardware Support
 # CONFIG_USB is not set
 # CONFIG_USB_SUPPORT is not set
 # CONFIG_SOUND is not set
 # CONFIG_SND is not set
+
+# Disable all USB support
+# CONFIG_USB_SUPPORT=n
+# CONFIG_USB=n
+# CONFIG_USB_XHCI_HCD=n
+# CONFIG_USB_EHCI_HCD=n
+# CONFIG_USB_OHCI_HCD=n
+# CONFIG_USB_DWC3=n
+# CONFIG_USB_DWC3_QCOM=n
 
 # Power Management (Minimal for Performance)
 # CONFIG_PM_DEBUG is not set
