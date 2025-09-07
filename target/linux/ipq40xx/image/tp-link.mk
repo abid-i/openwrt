@@ -19,6 +19,7 @@ define Device/tplink_deco-m4r-v3
 		kmod-gpio-button-hotplug \
 		kmod-crypto-hw-qce \
 		ath10k-board-qca4019 \
+		ipq-wifi-tplink_deco-m4r-v3 \
 		ath10k-firmware-qca4019 \
 		kmod-ath10k \
 		kmod-batman-adv \
@@ -31,9 +32,7 @@ define Device/tplink_deco-m4r-v3
 		kmod-8021q \
 		kmod-br-netfilter \
 		kmod-nft-offload \
-		kmod-sched-cake \
 		irqbalance \
-		kmod-tcp-bbr \
 		tc-tiny \
 		ethtool \
 		iwinfo \
@@ -60,8 +59,11 @@ define Device/tplink_deco-m4r-v3
 		-ppp-mod-pppoe \
 		-ppp \
 		-odhcp6c \
+		-odhcpd-ipv6only \
 		-kmod-usb-dwc3-qcom \
 		-kmod-usb3 \
+		-ath10k-firmware-qca4019-ct \
+		-kmod-ath10k-ct \
 		-kmod-usb-dwc3 \
 		-kmod-usb2 \
 		-kmod-usb-ohci \
