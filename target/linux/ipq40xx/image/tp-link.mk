@@ -17,7 +17,6 @@ define Device/tplink_deco-m4r-v3
 		kmod-leds-gpio \
 		kmod-gpio-button-hotplug \
 		kmod-crypto-hw-qce \
-		ath10k-board-qca4019 \
 		hostapd-common \
 		wpad-basic-mbedtls \
 		iwinfo \
@@ -29,7 +28,10 @@ define Device/tplink_deco-m4r-v3
 		firewall4 \
 		kmod-nft-offload \
 		bridge-utils \
+		kmod-sched-cake \
+		irqbalance \
 		tc-tiny \
+		luci \
 		luci-base \
 		luci-mod-admin-full \
 		luci-theme-bootstrap \
@@ -44,6 +46,9 @@ define Device/tplink_deco-m4r-v3
 		openssh-sftp-server \
 		kmod-tcp-bbr \
 		ethtool \
+		-ppp-mod-pppoe \
+		-ppp \
+		-odhcp6c \
 		-kmod-usb-dwc3-qcom \
 		-kmod-usb3 \
 		-kmod-usb-dwc3 \
@@ -62,8 +67,28 @@ define Device/tplink_deco-m4r-v3
   IMAGE/factory.bin := tplink-safeloader
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
   
-  # Basic compiler optimizations only
-  TARGET_CFLAGS += -Os -pipe
+  TARGET_CFLAGS += -O3 -ffunction-sections -fdata-sections \
+                   -fomit-frame-pointer -funroll-loops
+  
+  TARGET_LDFLAGS += -Wl,--gc-sections -Wl,--as-needed -Wl,-O1
+
+  # # IPQ4019 specific hardware optimizations 
+  # TARGET_CPPFLAGS += -DCONFIG_IPQ4019_EDMA_OPTIMIZATION \
+  #                    -DCONFIG_BATMAN_ADV_BATMAN_V \
+  #                    -DCONFIG_ATH10K_SPECTRAL \
+  #                    -DCONFIG_ATH10K_DFS_CERTIFIED \
+  #                    -DCONFIG_MAC80211_MESH \
+  #                    -DCONFIG_HOSTAPD_WPS \
+  #                    -DCONFIG_IEEE80211R \
+  #                    -DCONFIG_IEEE80211W \
+  #                    -DCONFIG_HS20 \
+  #                    -DCONFIG_WNM \
+  #                    -DCONFIG_FST \
+  #                    -DCONFIG_MBO \
+  #                    -DCONFIG_OCV \
+  #                    -DCONFIG_SAE \
+  #                    -DCONFIG_EAP_SERVER=0 \
+  #                    -DCONFIG_RADIUS_CLIENT=1
   
   SUPPORTED_DEVICES += deco-m4r-v3
 endef
