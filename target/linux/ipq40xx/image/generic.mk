@@ -1198,8 +1198,8 @@ define Device/tplink_deco-m4r-v3
 					kmod-8021q kmod-br-netfilter  kmod-crypto kmod-crypto-sha1-neon \
 					kmod-crypto-aes-arm-bs kmod-qca807x-phy kmod-sched-fq-codel \
 					kmod-gpio-button-hotplug kmod-crypto-hw-qce \
-					-kmod-usb-dwc3-qcom -kmod-usb3 -ath10k-firmware-qca4019-ct 
-					-kmod-ath10k-ct -kmod-usb-dwc3 -kmod-usb2 -kmod-usb-ohci 
+					-kmod-usb-dwc3-qcom -kmod-usb3 -ath10k-firmware-qca4019-ct \
+					-kmod-ath10k-ct -kmod-usb-dwc3 -kmod-usb2 -kmod-usb-ohci \
 					-kmod-usb-ehci -wpad-basic-mbedtls
 
   # Image generation with combined firmware partition
@@ -1225,8 +1225,12 @@ define Device/tplink_deco-m4r-v3
                      -DCONFIG_IEEE80211W \
                      -DCONFIG_WNM \
                      -DCONFIG_MBO \
-                     -DCONFIG_SAE
-  
+                     -DCONFIG_SAE \
+                     -DCONFIG_MTD_CFI_STAA \
+                     -DCONFIG_MTD_JEDECPROBE \
+                     -DCONFIG_MTD_SPLIT_TPLINK_FW \
+                     -DCONFIG_KERNEL_XZ
+
   SUPPORTED_DEVICES += deco-m4r-v3
 endef
 TARGET_DEVICES += tplink_deco-m4r-v3
