@@ -18,8 +18,6 @@
 	};
 
 	chosen {
-		// Boot from combined firmware partition for maximum space
-    bootargs = "root=/dev/mtdblock14 rootfstype=squashfs rootwait";
 		// Performance optimizations for mesh networking
 		bootargs-append = " rcu_nocbs=0-3 isolcpus=3 irqaffinity=0-2 cgroup_disable=memory";
 	};
