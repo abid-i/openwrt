@@ -1172,6 +1172,22 @@ define Device/tplink_deco-m4r-v3
   DEVICE_DTS_CONFIG := config@ap.dk04.1-c1
   TPLINK_BOARD_ID := DECO-M4R-V3
 
+  # DEVICE_PACKAGES := ath10k-board-qca4019 ipq-wifi-tplink_deco-m4r-v3 \
+  # 			ath10k-firmware-qca4019 batctl-default hostapd-full \
+  # 			wpad-mesh-mbedtls bridge-utils vlan irqbalance tc-tiny ethtool \
+  # 			iwinfo iw-full wireless-regdb uci netifd luci luci-base \
+  # 			luci-mod-admin-full luci-proto-batman-adv luci-app-batman-adv \
+  # 			ip-full curl wget-ssl ca-certificates kmod-ath10k kmod-batman-adv \
+  # 			kmod-leds-gpio kmod-mac80211 kmod-bridge kmod-vlan kmod-nf-flow \
+  # 			kmod-8021q kmod-br-netfilter  kmod-crypto kmod-crypto-sha1-neon \
+  # 			kmod-crypto-aes-arm-bs kmod-qca807x-phy kmod-sched-fq-codel \
+  # 			kmod-gpio-button-hotplug kmod-crypto-hw-qce \
+  # 			-ppp-mod-pppoe -ppp -odhcp6c -odhcpd-ipv6only -kmod-usb-dwc3-qcom \
+  # 			-kmod-usb3 -ath10k-firmware-qca4019-ct -kmod-ath10k-ct \
+  # 			-kmod-usb-dwc3 -kmod-usb2 -kmod-usb-ohci -kmod-usb-ehci \
+  # 			-uboot-envtools -kmod-ppp -kmod-pppoe -dnsmasq -odhcpd-ipv6only \
+  # 			-dropbear -wpad-basic-mbedtls
+
   DEVICE_PACKAGES := ath10k-board-qca4019 ipq-wifi-tplink_deco-m4r-v3 \
 					ath10k-firmware-qca4019 batctl-default hostapd-full \
 					wpad-mesh-mbedtls bridge-utils vlan irqbalance tc-tiny ethtool \
@@ -1182,11 +1198,9 @@ define Device/tplink_deco-m4r-v3
 					kmod-8021q kmod-br-netfilter  kmod-crypto kmod-crypto-sha1-neon \
 					kmod-crypto-aes-arm-bs kmod-qca807x-phy kmod-sched-fq-codel \
 					kmod-gpio-button-hotplug kmod-crypto-hw-qce \
-					-ppp-mod-pppoe -ppp -odhcp6c -odhcpd-ipv6only -kmod-usb-dwc3-qcom \
-					-kmod-usb3 -ath10k-firmware-qca4019-ct -kmod-ath10k-ct \
-					-kmod-usb-dwc3 -kmod-usb2 -kmod-usb-ohci -kmod-usb-ehci \
-					-uboot-envtools -kmod-ppp -kmod-pppoe -dnsmasq -odhcpd-ipv6only \
-					-dropbear -wpad-basic-mbedtls
+					-kmod-usb-dwc3-qcom -kmod-usb3 -ath10k-firmware-qca4019-ct 
+					-kmod-ath10k-ct -kmod-usb-dwc3 -kmod-usb2 -kmod-usb-ohci 
+					-kmod-usb-ehci -wpad-basic-mbedtls
 
   # Image generation with combined firmware partition
   IMAGES := factory.bin sysupgrade.bin
