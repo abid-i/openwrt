@@ -1207,29 +1207,30 @@ define Device/tplink_deco-m4r-v3
   IMAGE/factory.bin := append-rootfs | tplink-safeloader factory
   IMAGE/sysupgrade.bin := append-rootfs | tplink-safeloader sysupgrade | append-metadata
   
-  # Performance optimization compiler flags
-  TARGET_CFLAGS += -O3 -ffunction-sections -fdata-sections \
-                   -fomit-frame-pointer -funroll-loops \
-                   -mcpu=cortex-a7 -mfpu=neon-vfpv4 \
-                   -mfloat-abi=hard
+  # # Performance optimization compiler flags
+  # TARGET_CFLAGS += -O3 -ffunction-sections -fdata-sections \
+  #                  -fomit-frame-pointer -funroll-loops \
+  #                  -mcpu=cortex-a7 -mfpu=neon-vfpv4 \
+  #                  -mfloat-abi=hard
   
-  TARGET_LDFLAGS += -Wl,--gc-sections -Wl,--as-needed -Wl,-O1
+  # TARGET_LDFLAGS += -Wl,--gc-sections -Wl,--as-needed -Wl,-O1
 
   # IPQ4019 specific hardware optimizations
-  TARGET_CPPFLAGS += -DCONFIG_IPQ4019_EDMA_OPTIMIZATION \
-                     -DCONFIG_BATMAN_ADV_BATMAN_V \
-                     -DCONFIG_ATH10K_SPECTRAL \
-                     -DCONFIG_ATH10K_DFS_CERTIFIED \
-                     -DCONFIG_MAC80211_MESH \
-                     -DCONFIG_IEEE80211R \
-                     -DCONFIG_IEEE80211W \
-                     -DCONFIG_WNM \
-                     -DCONFIG_MBO \
-                     -DCONFIG_SAE \
-                     -DCONFIG_MTD_CFI_STAA \
-                     -DCONFIG_MTD_JEDECPROBE \
-                     -DCONFIG_MTD_SPLIT_TPLINK_FW \
-                     -DCONFIG_KERNEL_XZ
+  # TARGET_CPPFLAGS += -DCONFIG_IPQ4019_EDMA_OPTIMIZATION \
+  #                    -DCONFIG_BATMAN_ADV_BATMAN_V \
+  #                    -DCONFIG_ATH10K_SPECTRAL \
+  #                    -DCONFIG_ATH10K_DFS_CERTIFIED \
+  #                    -DCONFIG_MAC80211_MESH \
+  #                    -DCONFIG_IEEE80211R \
+  #                    -DCONFIG_IEEE80211W \
+  #                    -DCONFIG_WNM \
+  #                    -DCONFIG_MBO \
+  #                    -DCONFIG_SAE \
+  #                    -DCONFIG_MTD_CFI_STAA \
+  #                    -DCONFIG_MTD_JEDECPROBE \
+  #                    -DCONFIG_MTD_SPLIT_TPLINK_FW \
+  #                    -DCONFIG_KERNEL_XZ \
+  #                    -DCONFIG_TARGET_INITRAMFS_COMPRESSION_XZ
 
   SUPPORTED_DEVICES += deco-m4r-v3
 endef
