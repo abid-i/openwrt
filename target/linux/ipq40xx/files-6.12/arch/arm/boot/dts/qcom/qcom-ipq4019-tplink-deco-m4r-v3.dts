@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: GPL-2.0+ OR MIT
-
 /dts-v1/;
 
 #include "qcom-ipq4019.dtsi"
@@ -14,25 +13,27 @@
 
 	memory {
 		device_type = "memory";
-		reg = <0x80000000 0x10000000>; // 256MB RAM (M15T2G16128A)
+		reg = <0x80000000 0x10000000>; // 256MB DDR3L
 	};
 
 	chosen {
-		// Performance optimizations for mesh networking
-		bootargs-append = " rcu_nocbs=0-3 isolcpus=3 irqaffinity=0-2 cgroup_disable=memory";
+		// Conservative bootargs - only add what's not automatically added by OpenWrt
+		// Note: OpenWrt automatically adds root=, rootfstype=, console= etc.
+		// These are mesh-specific optimizations not added automatically
+		bootargs-append = " rcu_nocbs=0-3 isolcpus=3";
 	};
 
 	aliases {
 		led-boot = &led_blue;
 		led-failsafe = &led_red;
-		led-running = &led_green;
+		led-running = &led_green;  
 		led-upgrade = &led_red;
 		label-mac-device = &swport4;
 		serial0 = &blsp1_uart1;
 	};
 
 	soc {
-		// Optimized TCSR configurations for mesh performance
+		// TCSR configurations for IPQ4019 mesh performance
 		tcsr@194b000 {
 			compatible = "qcom,tcsr";
 			reg = <0x194b000 0x100>;
@@ -52,6 +53,7 @@
 			qcom,wifi_noc_memtype_m0_m2 = <TCSR_WIFI_NOC_MEMTYPE_M0_M2>;
 		};
 
+		// ESS TCSR for ethernet switch interface
 		ess_tcsr@1953000 {
 			compatible = "qcom,tcsr";
 			reg = <0x1953000 0x1000>;
@@ -126,12 +128,11 @@
 		};
 	};
 
-	// Optimized WiFi GPIO configuration for mesh performance
 	wifi_pins: wifi_pinmux {
 		pinmux_1 {
 			pins = "gpio37";
 			function = "gpio";
-			drive-strength = <8>; // Increased for stability
+			drive-strength = <8>;
 			bias-pull-up;
 			output-high;
 		};
@@ -170,14 +171,14 @@
 	flash@0 {
 		compatible = "jedec,spi-nor";
 		reg = <0>;
-		spi-max-frequency = <50000000>; // Optimized for performance
+		spi-max-frequency = <50000000>; // 50MHz for XM25QH256B
 
 		partitions {
 			compatible = "fixed-partitions";
 			#address-cells = <1>;
 			#size-cells = <1>;
 
-			// Boot and system partitions (read-only)
+			// Bootloader and configuration partitions - NEVER CHANGE THESE
 			partition@0 {
 				label = "SBL1";
 				reg = <0x000000 0x030000>;
@@ -231,6 +232,7 @@
 				read-only;
 			};
 
+			// ART partition with calibration data
 			art: partition@170000 {
 				label = "art";
 				reg = <0x170000 0x010000>;
@@ -247,7 +249,7 @@
 						#nvmem-cell-cells = <1>;
 					};
 
-					// WiFi calibration data for IPQ4019 dual-band radio
+					// WiFi calibration data for IPQ4019 radios
 					precal_art_1000: precal@1000 {
 						reg = <0x1000 0x2f20>;
 					};
@@ -258,45 +260,131 @@
 				};
 			};
 
-			// Configuration partitions
+			// Configuration partitions from OPAQUE region
 			partition@180000 {
-				label = "OPAQUE";
-				reg = <0x180000 0x0c0000>;
+				label = "default-mac";
+				reg = <0x180000 0x001000>;
 				read-only;
 			};
 
-			// SLOT 0 - Stock firmware (kept for recovery)
+			partition@181000 {
+				label = "device-id";
+				reg = <0x181000 0x001000>;
+				read-only;
+			};
+
+			partition@182000 {
+				label = "product-info";
+				reg = <0x182000 0x006000>;
+				read-only;
+			};
+
+			partition@190000 {
+				label = "support-list";
+				reg = <0x190000 0x010000>;
+				read-only;
+			};
+
+			partition@200000 {
+				label = "user-config";
+				reg = <0x200000 0x010000>;
+				read-only;
+			};
+
+			partition@210000 {
+				label = "device-config";
+				reg = <0x210000 0x010000>;
+				read-only;
+			};
+
+			partition@220000 {
+				label = "group-info";
+				reg = <0x220000 0x010000>;
+				read-only;
+			};
+
+			partition@230000 {
+				label = "partition-table@0";
+				reg = <0x230000 0x002000>;
+				read-only;
+			};
+
+			// SLOT 0 - Stock firmware partitions (KEEP SEPARATE for recovery)
 			partition@240000 {
-				label = "firmware-slot0";
-				reg = <0x240000 0xd20000>;
+				label = "os-image@0";
+				reg = <0x240000 0x320000>;
 				read-only;
 			};
 
-			// Configuration and metadata
+			partition@560000 {
+				label = "file-system@0";
+				reg = <0x560000 0xa00000>;
+				read-only;
+			};
+
 			partition@f60000 {
-				label = "stock-config";
-				reg = <0xf60000 0x060000>;
+				label = "soft-version@0";
+				reg = <0xf60000 0x010000>;
 				read-only;
 			};
 
-			// SLOT 1 - OpenWrt firmware (15.375MB combined space)
-			// MTD splitter automatically separates kernel and rootfs
+			partition@f70000 {
+				label = "profile@0";
+				reg = <0xf70000 0x010000>;
+				read-only;
+			};
+
+			partition@f80000 {
+				label = "default-config@0";
+				reg = <0xf80000 0x010000>;
+				read-only;
+			};
+
+			partition@f90000 {
+				label = "partition-table@1";
+				reg = <0xf90000 0x002000>;
+				read-only;
+			};
+
+			partition@fa0000 {
+				label = "fs-uboot@1";
+				reg = <0xfa0000 0x080000>;
+				read-only;
+			};
+
+			// SLOT 1 - OpenWrt firmware partition (ONLY THESE TWO COMBINED)
+			// This combines os-image@1 + file-system@1 + gap for OpenWrt
+			// Total: 0x1fc0000 - 0x1020000 = 0xfa0000 (16000KB = 15.625MB)
 			partition@1020000 {
 				label = "firmware";
-				reg = <0x1020000 0xf60000>;
+				reg = <0x1020000 0xfa0000>;
 				compatible = "tplink,firmware";
 			};
 
-			// Slot 1 metadata partitions
-			partition@1f80000 {
-				label = "config-data";
-				reg = <0x1f80000 0x080000>;
+			// Slot 1 metadata partitions (KEEP SEPARATE)
+			partition@1fc0000 {
+				label = "soft-version@1";
+				reg = <0x1fc0000 0x010000>;
+			};
+
+			partition@1fd0000 {
+				label = "profile@1";
+				reg = <0x1fd0000 0x010000>;
+			};
+
+			partition@1fe0000 {
+				label = "default-config@1";
+				reg = <0x1fe0000 0x010000>;
+			};
+
+			partition@1ff0000 {
+				label = "url-sig";
+				reg = <0x1ff0000 0x010000>;
 			};
 		};
 	};
 };
 
-// Hardware crypto acceleration for mesh performance
 &crypto {
 	status = "okay";
 };
@@ -309,13 +397,12 @@
 	status = "okay";
 };
 
-// Network configuration optimized for mesh and VLAN switching
 &mdio {
 	status = "okay";
 	pinctrl-0 = <&mdio_pins>;
 	pinctrl-names = "default";
 	reset-gpios = <&tlmm 47 GPIO_ACTIVE_LOW>;
-	reset-delay-us = <2000>; // Increased for stability
+	reset-delay-us = <2000>;
 };
 
 &watchdog {
@@ -344,7 +431,6 @@
 	nvmem-cells = <&macaddr_art_0 1>;
 };
 
-// WiFi configuration optimized for mesh performance and RADIUS VLAN mapping
 &wifi0 {
 	status = "okay";
 	pinctrl-0 = <&wifi_pins>;
@@ -352,6 +438,8 @@
 	nvmem-cell-names = "pre-calibration", "mac-address";
 	nvmem-cells = <&precal_art_1000>, <&macaddr_art_0 2>;
 	qcom,ath10k-calibration-variant = "tplink_deco-m4r-v3";
+	qcom,coexist-support = <1>;
+	ieee80211-freq-limit = <2402000 2482000>;
 };
 
 &wifi1 {
@@ -359,9 +447,10 @@
 	nvmem-cell-names = "pre-calibration", "mac-address";
 	nvmem-cells = <&precal_art_5000>, <&macaddr_art_0 3>;
 	qcom,ath10k-calibration-variant = "tplink_deco-m4r-v3";
+	ieee80211-freq-limit = <5170000 5835000>;
 };
 
-// Disable unused USB interfaces for power savings and reduced complexity
+// Disable USB to save power and reduce complexity
 &usb2 {
 	status = "disabled";
 };

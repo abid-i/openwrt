@@ -1165,76 +1165,51 @@ define Device/tplink_deco-m4r-v3
   DEVICE_VARIANT := v3
   BOARD_NAME := deco-m4r-v3
   SOC := qcom-ipq4019
+  
   BLOCKSIZE := 64k
   PAGESIZE := 2048
-  # Combined firmware partition approach (15.375MB total space)
-  IMAGE_SIZE := 15744k
+  
+  # CORRECTED: Combined firmware partition size using available space + gap
+  # Based on corrected partition layout: 0x1020000 to 0x1fc0000 = 0xfa0000 = 16000KB
+  IMAGE_SIZE := 16000k
+  
   DEVICE_DTS := qcom-ipq4019-tplink-deco-m4r-v3
-  DEVICE_DTS_CONFIG := config@ap.dk04.1-c1
+  DEVICE_DTS_CONFIG := config@ap.dk04.1-c1 
+  
   TPLINK_BOARD_ID := DECO-M4R-V3
-
-  # DEVICE_PACKAGES := ath10k-board-qca4019 ipq-wifi-tplink_deco-m4r-v3 \
-  # 			ath10k-firmware-qca4019 batctl-default hostapd-full \
-  # 			wpad-mesh-mbedtls bridge-utils vlan irqbalance tc-tiny ethtool \
-  # 			iwinfo iw-full wireless-regdb uci netifd luci luci-base \
-  # 			luci-mod-admin-full luci-proto-batman-adv luci-app-batman-adv \
-  # 			ip-full curl wget-ssl ca-certificates kmod-ath10k kmod-batman-adv \
-  # 			kmod-leds-gpio kmod-mac80211 kmod-bridge kmod-vlan kmod-nf-flow \
-  # 			kmod-8021q kmod-br-netfilter  kmod-crypto kmod-crypto-sha1-neon \
-  # 			kmod-crypto-aes-arm-bs kmod-qca807x-phy kmod-sched-fq-codel \
-  # 			kmod-gpio-button-hotplug kmod-crypto-hw-qce \
-  # 			-ppp-mod-pppoe -ppp -odhcp6c -odhcpd-ipv6only -kmod-usb-dwc3-qcom \
-  # 			-kmod-usb3 -ath10k-firmware-qca4019-ct -kmod-ath10k-ct \
-  # 			-kmod-usb-dwc3 -kmod-usb2 -kmod-usb-ohci -kmod-usb-ehci \
-  # 			-uboot-envtools -kmod-ppp -kmod-pppoe -dnsmasq -odhcpd-ipv6only \
-  # 			-dropbear -wpad-basic-mbedtls
-
-  DEVICE_PACKAGES := ath10k-board-qca4019 ipq-wifi-tplink_deco-m4r-v3 \
-					ath10k-firmware-qca4019 batctl-default hostapd-full \
-					wpad-mesh-mbedtls bridge-utils vlan irqbalance tc-tiny ethtool \
-					iwinfo iw-full wireless-regdb uci netifd luci luci-base \
-					luci-mod-admin-full luci-proto-batman-adv luci-app-batman-adv \
-					ip-full curl wget-ssl ca-certificates kmod-ath10k kmod-batman-adv \
-					kmod-leds-gpio kmod-mac80211 kmod-bridge kmod-vlan kmod-nf-flow \
-					kmod-8021q kmod-br-netfilter  kmod-crypto kmod-crypto-sha1-neon \
-					kmod-crypto-aes-arm-bs kmod-qca807x-phy kmod-sched-fq-codel \
-					kmod-gpio-button-hotplug kmod-crypto-hw-qce \
-					-kmod-usb-dwc3-qcom -kmod-usb3 -ath10k-firmware-qca4019-ct \
-					-kmod-ath10k-ct -kmod-usb-dwc3 -kmod-usb2 -kmod-usb-ohci \
-					-kmod-usb-ehci -wpad-basic-mbedtls
-
-  # Image generation with combined firmware partition
+  
+  # Core mesh networking packages optimized for IPQ4019
+  DEVICE_PACKAGES := \
+    ath10k-board-qca4019 ipq-wifi-tplink_deco-m4r-v3 ath10k-firmware-qca4019 \
+    hostapd-full wpad-mesh-mbedtls iw-full iwinfo wireless-regdb batctl-default \
+    kmod-batman-adv bridge-utils vlan kmod-8021q kmod-bridge kmod-br-netfilter \
+    kmod-vlan irqbalance tc-tiny ethtool kmod-sched-fq-codel kmod-nf-flow \
+    kmod-crypto-hw-qce kmod-crypto-aes-arm-bs kmod-crypto-sha1-neon luci \
+    luci-base luci-mod-admin-full luci-proto-batman-adv luci-app-batman-adv \
+    luci-app-advanced-reboot ip-full curl wget-ssl ca-certificates uci netifd \
+    kmod-ath10k kmod-mac80211 kmod-leds-gpio kmod-gpio-button-hotplug
+    
+  # Remove unnecessary packages to save space and avoid conflicts
+  DEVICE_PACKAGES += \
+    -kmod-usb-dwc3-qcom -kmod-usb-dwc3 -kmod-usb3 -kmod-usb2 -kmod-usb-ohci \
+    -kmod-usb-ehci -usb-utils -ath10k-firmware-qca4019-ct -kmod-ath10k-ct \
+    -wpad-basic-mbedtls -ppp -ppp-mod-pppoe -kmod-pppoe -kmod-pppox -kmod-slhc
+  
   IMAGES := factory.bin sysupgrade.bin
-  IMAGE/factory.bin := append-rootfs | tplink-safeloader factory
-  IMAGE/sysupgrade.bin := append-rootfs | tplink-safeloader sysupgrade | append-metadata
+  IMAGE/factory.bin := append-rootfs | tplink-safeloader factory | check-size
+  IMAGE/sysupgrade.bin := append-rootfs | tplink-safeloader sysupgrade | append-metadata | check-size
   
-  # # Performance optimization compiler flags
-  # TARGET_CFLAGS += -O3 -ffunction-sections -fdata-sections \
-  #                  -fomit-frame-pointer -funroll-loops \
-  #                  -mcpu=cortex-a7 -mfpu=neon-vfpv4 \
-  #                  -mfloat-abi=hard
-  
-  # TARGET_LDFLAGS += -Wl,--gc-sections -Wl,--as-needed -Wl,-O1
-
-  # IPQ4019 specific hardware optimizations
-  # TARGET_CPPFLAGS += -DCONFIG_IPQ4019_EDMA_OPTIMIZATION \
-  #                    -DCONFIG_BATMAN_ADV_BATMAN_V \
-  #                    -DCONFIG_ATH10K_SPECTRAL \
-  #                    -DCONFIG_ATH10K_DFS_CERTIFIED \
-  #                    -DCONFIG_MAC80211_MESH \
-  #                    -DCONFIG_IEEE80211R \
-  #                    -DCONFIG_IEEE80211W \
-  #                    -DCONFIG_WNM \
-  #                    -DCONFIG_MBO \
-  #                    -DCONFIG_SAE \
-  #                    -DCONFIG_MTD_CFI_STAA \
-  #                    -DCONFIG_MTD_JEDECPROBE \
-  #                    -DCONFIG_MTD_SPLIT_TPLINK_FW \
-  #                    -DCONFIG_KERNEL_XZ \
-  #                    -DCONFIG_TARGET_INITRAMFS_COMPRESSION_XZ
-
   SUPPORTED_DEVICES += deco-m4r-v3
+  
+  # REMOVED: TARGET_CFLAGS - OpenWrt automatically sets optimal flags for ipq40xx
+  # The ipq40xx target already includes -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
+  # Adding duplicate flags can cause compilation issues
+  
+  # REMOVED: KERNEL_PATCHVER - This is set globally for the target
+  # Device-specific kernel configs go in target/linux/ipq40xx/tplink_deco-m4r-v3/config-6.12
+  
 endef
+
 TARGET_DEVICES += tplink_deco-m4r-v3
 
 define Device/unielec_u4019-32m
