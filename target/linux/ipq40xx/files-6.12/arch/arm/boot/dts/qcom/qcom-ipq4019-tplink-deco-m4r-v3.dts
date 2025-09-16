@@ -17,7 +17,6 @@
 	};
 
 	chosen {
-		// Conservative bootargs - only add what's not automatically added by OpenWrt
 		// Note: OpenWrt automatically adds root=, rootfstype=, console= etc.
 		// These are mesh-specific optimizations not added automatically
 		bootargs-append = " rcu_nocbs=0-3 isolcpus=3";
@@ -33,7 +32,6 @@
 	};
 
 	soc {
-		// TCSR configurations for IPQ4019 mesh performance
 		tcsr@194b000 {
 			compatible = "qcom,tcsr";
 			reg = <0x194b000 0x100>;
@@ -53,7 +51,6 @@
 			qcom,wifi_noc_memtype_m0_m2 = <TCSR_WIFI_NOC_MEMTYPE_M0_M2>;
 		};
 
-		// ESS TCSR for ethernet switch interface
 		ess_tcsr@1953000 {
 			compatible = "qcom,tcsr";
 			reg = <0x1953000 0x1000>;
@@ -352,7 +349,6 @@
 				read-only;
 			};
 
-			// SLOT 1 - OpenWrt firmware partition (ONLY THESE TWO COMBINED)
 			// This combines os-image@1 + file-system@1 + gap for OpenWrt
 			// Total: 0x1fc0000 - 0x1020000 = 0xfa0000 (16000KB = 15.625MB)
 			partition@1020000 {
