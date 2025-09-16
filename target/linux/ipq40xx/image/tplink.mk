@@ -47,7 +47,11 @@ define Device/tplink_deco-m4r-v3
   IMAGE/factory.bin := append-rootfs | tplink-safeloader factory | check-size
   IMAGE/sysupgrade.bin := append-rootfs | tplink-safeloader sysupgrade | append-metadata | check-size
   
+
+	KERNEL_PATCHVER := 6.12
+
   SUPPORTED_DEVICES += deco-m4r-v3
+
   
 endef
 
