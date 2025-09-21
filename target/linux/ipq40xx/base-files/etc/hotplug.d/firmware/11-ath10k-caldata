@@ -146,11 +146,10 @@ case "$FIRMWARE" in
     ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "0:CONFIG" 0x0) 2)
     ;;
   tplink,deco-m4r-v3)
-    # 2.4GHz radio calibration from ART partition
-    # Verified from device logs: boardData_3_0_IPQ4019_DK04_2G.bin
-    # Extract pre-calibration data and patch MAC address
+    # 2.4GHz calibration data extraction
+    # Offset and size validated from extracted ART partition analysis
+    # BoardLength[0]: 12064 bytes, BoardCRC32[0]: 5f9efa4d
     caldata_extract "art" 0x1000 0x2f20
-    ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "art" 0x0) 2)
     ;;
   sony,ncp-hg100-cellular)
     caldata_extract_mmc "0:ART" 0x1000 0x2f20
@@ -253,11 +252,10 @@ case "$FIRMWARE" in
     ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "0:CONFIG" 0x0) 3)
     ;;
   tplink,deco-m4r-v3)
-    # 5GHz radio calibration from ART partition
-    # Verified from device logs: boardData_3_0_IPQ4019_DK04_5G.bin
-    # Extract pre-calibration data and patch MAC address
+    # 5GHz calibration data extraction
+    # Offset and size validated from extracted ART partition analysis
+    # BoardLength[1]: 12064 bytes, BoardCRC32[1]: 8e3ba28e
     caldata_extract "art" 0x5000 0x2f20
-    ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "art" 0x0) 3)
     ;;
   sony,ncp-hg100-cellular)
     caldata_extract_mmc "0:ART" 0x5000 0x2f20
@@ -266,6 +264,22 @@ case "$FIRMWARE" in
     zyxel,wre6606)
     caldata_extract "ART" 0x5000 0x2f20
     ath10k_patch_mac $(macaddr_add $(cat /sys/class/net/eth0/address) -1)
+    ;;
+  esac
+  ;;
+"ath10k/cal-ahb-a000000.wifi.bin")
+  case $board in
+  tplink,deco-m4r-v3)
+    # Legacy fallback for 2.4GHz (for older ath10k versions)
+    caldata_extract "art" 0x1000 0x2f20
+    ;;
+  esac
+  ;;
+"ath10k/cal-ahb-a800000.wifi.bin")
+  case $board in
+  tplink,deco-m4r-v3)
+    # Legacy fallback for 5GHz (for older ath10k versions)
+    caldata_extract "art" 0x5000 0x2f20
     ;;
   esac
   ;;

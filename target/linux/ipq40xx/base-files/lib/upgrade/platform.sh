@@ -25,6 +25,14 @@ Once this is done. Retry.
 EOF
     return 1
     ;;
+  tplink,deco-m4r-v3)
+    # Validate TP-Link safeloader format for combined firmware
+    local magic=$(get_magic_long "$1")
+    [ "$magic" = "00cb0c10" ] && return 0
+
+    echo "Invalid image magic: $(printf %08x $magic)"
+    return 1
+    ;;
   zte,mf18a | \
     zte,mf282plus | \
     zte,mf286d | \
@@ -227,8 +235,10 @@ platform_do_upgrade() {
     CI_UBIPART="rootfs"
     nand_do_upgrade "$1"
     ;;
-  tp-link,deco-m4r-v3)
-    default_do_upgrade "$1"
+  tplink,deco-m4r-v3)
+    # Combined firmware partition upgrade using MTD
+    # The MTD splitter will automatically separate kernel/rootfs
+    default_do_upgrade "$@"
     ;;
   zyxel,nbg6617)
     zyxel_do_upgrade "$1"

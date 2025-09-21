@@ -17,8 +17,8 @@ endef
 
 include $(SUBTARGET).mk
 
-ifeq ($(SUBTARGET),generic)
-	include generic-tp-link.mk
-endif
+# ifeq ($(SUBTARGET),generic)
+# 	include generic-tp-link.mk
+# endif
 
 $(eval $(call BuildImage))

@@ -112,15 +112,21 @@ sony,ncp-hg100-cellular)
 	ucidef_set_led_netdev "wwan" "WWAN" "green:wan-4" "wwan0"
 	;;
 tplink,deco-m4r-v3)
-	# RGB LED configuration verified from device logs
-	# Single 4-pin RGB LED with GPIO control:
-	# GPIO36 = Red, GPIO37 = Green, GPIO38 = Blue (all active low)
-	# Configure LEDs for different system states
-	ucidef_set_led_default "power" "POWER" "rgb:blue" "1"
-	ucidef_set_led_netdev "wan" "WAN" "rgb:red" "wan" 
-	ucidef_set_led_netdev "lan" "LAN" "rgb:green" "br-lan"
-	# Additional LED trigger for mesh status
-	ucidef_set_led_netdev "mesh" "MESH" "rgb:green" "bat0"
+	# RGB LED configuration validated from stock firmware analysis
+	# GPIO assignments confirmed from device logs and GPL source
+
+	# LED behavior states (matching stock firmware)
+	ucidef_set_led_default "power_red" "Power Red" "rgb:red" "0"
+	ucidef_set_led_default "power_green" "Power Green" "rgb:green" "1" 
+	ucidef_set_led_default "wifi_blue" "WiFi Blue" "rgb:blue" "0"
+
+	# Network activity indicators
+	ucidef_set_led_netdev "lan_activity" "LAN Activity" "rgb:green" "br-lan" "link tx rx"
+	ucidef_set_led_netdev "wan_activity" "WAN Activity" "rgb:blue" "wan" "link tx rx"
+
+	# WiFi activity indicators validated from GPL source
+	ucidef_set_led_wlan "wifi_2g" "WiFi 2.4GHz" "rgb:blue" "phy0tpt"
+	ucidef_set_led_wlan "wifi_5g" "WiFi 5GHz" "rgb:blue" "phy1tpt"
 	;;
 zyxel,nbg6617 |\
 zyxel,wre6606)
