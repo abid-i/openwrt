@@ -1,5 +1,7 @@
 BOARDNAME := TP-Link Devices
 FEATURES += minor
+# FEATURES += squashfs fpu ramdisk nand usb usbgadget TODO: check again
+
 
 # Core IPQ4019 hardware support
 DEFAULT_PACKAGES += kmod-leds-gpio kmod-gpio-button-hotplug
@@ -12,7 +14,7 @@ DEFAULT_PACKAGES += ath10k-board-qca4019 ath10k-firmware-qca4019 \
 										kmod-ath10k kmod-mac80211 kmod-mac80211-mesh \
 										kmod-cfg80211 wireless-regdb
 # QCA8072 DSA managed switch support
-DEFAULT_PACKAGES += kmod-dsa kmod-dsa-qca8k kmod-dsa-core kmod-dsa-tag-qca
+DEFAULT_PACKAGES += kmod-dsa kmod-dsa-qca8k kmod-dsa-core kmod-dsa-tag-qca kmod-phy-qca807x
 # fw4/nftables with hardware flow offloading  
 DEFAULT_PACKAGES +=  kmod-nft-core kmod-nft-nat kmod-nft-offload \
 										 kmod-nf-flow nftables-json fw4
@@ -38,7 +40,15 @@ DEFAULT_PACKAGES += -ppp -ppp-mod-pppoe -kmod-pppoe -kmod-pppox -kmod-slhc \
 										-kmod-ath10k-ct -swconfig -kmod-swconfig -dnsmasq \
 										-odhcpd -wpad-mesh-mbedtls
 
+# Essential system packages TODO: check again
+# DEFAULT_PACKAGES += luci-ssl-nginx luci-mod-admin-full luci-theme-bootstrap \
+#                    luci-app-firewall luci-app-opkg
+# Space-optimized core packages
+# DEFAULT_PACKAGES += dropbear logd urng-entropy urandom-seed
+
+# TODO : check if needed , if config-default says lto
 define Package/lto-flags
   TARGET_CFLAGS += -flto=auto
   TARGET_LDFLAGS += -flto=auto
 endef
+

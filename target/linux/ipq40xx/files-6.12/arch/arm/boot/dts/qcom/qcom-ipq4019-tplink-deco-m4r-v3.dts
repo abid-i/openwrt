@@ -9,33 +9,346 @@
 #include <dt-bindings/soc/qcom,tcsr.h>
 
 / {
-	model = "TP-Link Deco M4R v3";
-	compatible = "tplink,deco-m4r-v3", "qcom,ipq4019";
+    model = "TP-Link Deco M4R v3";
+    compatible = "tplink,deco-m4r-v3", "qcom,ipq4019";
 
-	// Verified 256MB DDR3L from UART logs  
-	memory {
-		device_type = "memory";
-		reg = <0x80000000 0x10000000>; /* 256MB DDR3L */
-	};
+    aliases {
+        led-boot = &led_power_blue;
+        led-failsafe = &led_power_red;
+        led-running = &led_power_blue;
+        led-upgrade = &led_power_blue;
+        label-mac-device = &gmac0;
+		    serial0 = &blsp1_uart1;
+        ethernet0 = &gmac0;
+        ethernet1 = &gmac1;
+    };
 
-	chosen {
-		// Optimized bootargs for maximum performance and mesh networking
-		// Validated compatible with stock U-Boot 2012.07
-		bootargs-append = " rcu_nocbs=0-3 isolcpus=3 quiet loglevel=4";
-	};
+    chosen {
+        /* stdout-path = "serial0:115200n8"; TODO: check */
+        bootargs-append = " swiotlb=1 coherent_pool=2M";
+		    /* bootargs-append = " rcu_nocbs=0-3 isolcpus=3 quiet loglevel=4"; TODO: check */
+    };
 
-	aliases {
-		led-boot = &led_blue;
-		led-failsafe = &led_red;
-		led-running = &led_green;  
-		led-upgrade = &led_red;
-		label-mac-device = &swport4;
-		serial0 = &blsp1_uart1;
-		ethernet0 = &swport4;
-		ethernet1 = &swport5;
-	};
+    memory {
+        device_type = "memory";
+        reg = <0x80000000 0x10000000>; /* 256MB DDR3L */
+    };
 
-	soc {
+    keys {
+        compatible = "gpio-keys";
+
+        reset {
+            label = "reset";
+            gpios = <&tlmm 63 GPIO_ACTIVE_LOW>;
+			      /* gpios = <&tlmm 18 GPIO_ACTIVE_LOW>; TODO: check */
+            linux,code = <KEY_RESTART>;
+			      /* debounce-interval = <60>; TODO: check */
+        };
+    };
+
+    leds {
+        compatible = "gpio-leds";
+
+        led_power_blue: power_blue {
+            label = "blue:power";
+            gpios = <&tlmm 32 GPIO_ACTIVE_LOW>;
+            default-state = "keep";
+        };
+
+        led_power_red: power_red {
+            label = "red:power";
+            gpios = <&tlmm 33 GPIO_ACTIVE_LOW>;
+        };
+
+        /* led_red: led-0 { TODO:check */
+        /*   label = "rgb:red"; */
+        /*   gpios = <&tlmm 36 GPIO_ACTIVE_LOW>; */
+        /*   color = <LED_COLOR_ID_RED>; */
+        /*   function = LED_FUNCTION_STATUS; */
+        /* }; */
+        /**/
+        /* led_green: led-1 { */
+        /*   label = "rgb:green"; */
+        /*   gpios = <&tlmm 37 GPIO_ACTIVE_LOW>; */
+        /*   color = <LED_COLOR_ID_GREEN>; */
+        /*   function = LED_FUNCTION_POWER; */
+        /* }; */
+        /**/
+        /* led_blue: led-2 { */
+        /*   label = "rgb:blue"; */
+        /*   gpios = <&tlmm 38 GPIO_ACTIVE_LOW>; */
+        /*   color = <LED_COLOR_ID_BLUE>; */
+        /*   function = LED_FUNCTION_WPS; */
+        /* }; */
+
+    };
+};
+
+&blsp1_spi1 {
+    status = "okay";
+    cs-gpios = <&tlmm 54 GPIO_ACTIVE_HIGH>, <&tlmm 59 GPIO_ACTIVE_HIGH>;
+
+    /* pinctrl-0 = <&spi_0_pins>; TODO:check */
+    /* pinctrl-names = "default"; */
+    /* status = "okay"; */
+    /* cs-gpios = <&tlmm 12 GPIO_ACTIVE_HIGH>; */
+
+    /* flash0: flash@0 { TODO:check */
+    flash@0 {
+        compatible = "jedec,spi-nor";
+        reg = <0>;
+        spi-max-frequency = <24000000>;
+        // Optimized frequency for XM25QH256B - verified from datasheet
+		    /* spi-max-frequency = <50000000>; */
+
+        partitions {
+            compatible = "fixed-partitions";
+            #address-cells = <1>;
+            #size-cells = <1>;
+
+            partition@0 {
+                label = "SBL1";
+                reg = <0x000000 0x030000>;
+                read-only;
+            };
+
+            partition@30000 {
+                label = "BOOTCONFIG";
+                reg = <0x030000 0x010000>;
+                read-only;
+            };
+
+            partition@40000 {
+                label = "MIBIB";
+                reg = <0x040000 0x010000>;
+                read-only;
+            };
+
+            partition@50000 {
+                label = "BOOTCONFIG1";
+                reg = <0x050000 0x010000>;
+                read-only;
+            };
+
+            partition@60000 {
+                label = "QSEE";
+                reg = <0x060000 0x060000>;
+                read-only;
+            };
+
+            partition@c0000 {
+                label = "CDT";
+                reg = <0x0c0000 0x010000>;
+                read-only;
+            };
+
+            partition@d0000 {
+                label = "DDRPARAMS";
+                reg = <0x0d0000 0x010000>;
+                read-only;
+            };
+
+            partition@e0000 {
+                label = "uboot-env";
+                reg = <0x0e0000 0x010000>;
+            };
+
+            partition@f0000 {
+                label = "u-boot";
+                reg = <0x0f0000 0x080000>;
+                read-only;
+            };
+
+      			/* art: partition@170000 { TODO: check */
+            partition@170000 {
+                label = "art";
+                reg = <0x170000 0x010000>;
+                read-only;
+                
+                nvmem-layout {
+                    compatible = "fixed-layout";
+                    #address-cells = <1>;
+                    #size-cells = <1>;
+
+                    macaddr_art_0: macaddr@0 {
+                      	/* compatible = "mac-base"; TODO: check */
+                        reg = <0x0 0x6>;
+                        /* #nvmem-cell-cells = <1>; TODO: check */
+
+                    };
+
+                    macaddr_art_6: macaddr@6 { // TODO: check 
+                        reg = <0x6 0x6>;
+                    };
+
+                    precal_art_1000: precal@1000 {
+                        reg = <0x1000 0x2f20>;
+                    };
+
+                    precal_art_5000: precal@5000 {
+                        reg = <0x5000 0x2f20>;
+                    };
+                };
+            };
+
+            /* Configuration partitions */
+            partition@180000 {
+                label = "default-mac";
+                reg = <0x180000 0x001000>;
+                read-only;
+            };
+
+            partition@181000 {
+                label = "device-id";
+                reg = <0x181000 0x001000>;
+                read-only;
+            };
+
+            partition@182000 {
+                label = "product-info";
+                reg = <0x182000 0x006000>;
+                read-only;
+            };
+
+            partition@190000 {
+                label = "support-list";
+                reg = <0x190000 0x010000>;
+                read-only;
+            };
+
+            partition@200000 {
+                label = "user-config";
+                reg = <0x200000 0x010000>;
+                /* read-only; TODO: check */
+
+            };
+
+            partition@210000 {
+                label = "device-config";
+                reg = <0x210000 0x010000>;
+                /* read-only; TODO: check */
+
+            };
+
+            partition@220000 {
+                label = "group-info";
+                reg = <0x220000 0x010000>;
+                /* read-only; TODO: check */
+
+            };
+
+            partition@230000 {
+                label = "partition-table";
+                /* label = "partition-table0"; TODO: check */
+
+                reg = <0x230000 0x002000>;
+                read-only;
+            };
+
+            /* SLOT 0 - Stock firmware */
+            partition@240000 {
+                label = "os-image";
+                /* label = "os-image0"; TODO: check */
+                reg = <0x240000 0x320000>;
+                /* read-only; TODO: check */
+
+            };
+
+            partition@560000 {
+                label = "file-system";
+                /* label = "file-system0"; TODO: check */
+                reg = <0x560000 0xa00000>;
+                /* read-only; TODO: check */
+            };
+
+            partition@f60000 {
+                label = "soft-version";
+                /* label = "soft-version0"; TODO: check */
+                reg = <0xf60000 0x010000>;
+                /* read-only; TODO: check */
+            };
+
+            partition@f70000 {
+                label = "profile";
+                /* label = "profile0"; TODO: check */
+                reg = <0xf70000 0x010000>;
+                /* read-only; TODO: check */
+            };
+
+            partition@f80000 {
+                label = "default-config";
+                /* label = "default-config0"; TODO: check */
+                reg = <0xf80000 0x010000>;
+                /* read-only; TODO: check */
+            };
+
+            partition@f90000 {
+                label = "partition-table1";
+                reg = <0xf90000 0x002000>;
+                read-only;
+            };
+
+            partition@fa0000 {
+                label = "fs-uboot1";
+                reg = <0xfa0000 0x080000>;
+                read-only;
+            };
+
+            /* SLOT 1 - OpenWrt firmware with MTD splitting */
+            partition@1020000 {
+                label = "firmware";
+                reg = <0x1020000 0xfa0000>;
+                compatible = "tplink,firmware";
+            };
+
+            partition@1fc0000 {
+                label = "soft-version1";
+                reg = <0x1fc0000 0x010000>;
+            };
+
+            partition@1fd0000 {
+                label = "profile1";
+                reg = <0x1fd0000 0x010000>;
+            };
+
+            partition@1fe0000 {
+                label = "default-config1";
+                reg = <0x1fe0000 0x010000>;
+            };
+
+            partition@1ff0000 {
+                label = "url-sig";
+                reg = <0x1ff0000 0x010000>;
+                read-only; // TODO: check if needed
+            };
+        };
+    };
+};
+// TODO: check soc
+	soc { 
+    rng@22000 {
+        status = "okay";
+    };
+
+    mdio@90000 {
+        status = "okay";
+    };
+      crypto@8e3a000 {
+        status = "okay";
+    };
+
+    watchdog@b017000 {
+        status = "okay";
+    };
+
+    ess-switch@c000000 {
+        status = "okay";
+    };
+
+    edma@c080000 {
+        status = "okay";
+    };
+
 		// TCSR configurations - critical for IPQ4019 performance
 		tcsr@194b000 {
 			compatible = "qcom,tcsr";
@@ -66,352 +379,224 @@
 		};
 	};
 
-	keys {
-		compatible = "gpio-keys";
 
-		reset {
-			label = "reset";
-			gpios = <&tlmm 18 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_RESTART>;
-			debounce-interval = <60>;
-		};
-	};
+// TODO: cehck if needed
+&blsp1_uart1 {
+  	/* pinctrl-0 = <&serial_pins>; TODO: check */
+  	/* pinctrl-names = "default"; */
 
-	leds {
-		compatible = "gpio-leds";
-
-		// RGB LED configuration validated from GPL source
-		led_red: led-0 {
-			label = "rgb:red";
-			gpios = <&tlmm 36 GPIO_ACTIVE_LOW>;
-			color = <LED_COLOR_ID_RED>;
-			function = LED_FUNCTION_STATUS;
-		};
-
-		led_green: led-1 {
-			label = "rgb:green";
-			gpios = <&tlmm 37 GPIO_ACTIVE_LOW>;
-			color = <LED_COLOR_ID_GREEN>;
-			function = LED_FUNCTION_POWER;
-		};
-
-		led_blue: led-2 {
-			label = "rgb:blue";
-			gpios = <&tlmm 38 GPIO_ACTIVE_LOW>;
-			color = <LED_COLOR_ID_BLUE>;
-			function = LED_FUNCTION_WPS;
-		};
-	};
+    status = "okay";
 };
 
-&tlmm {
-	serial_pins: serial_pinmux {
-		mux {
-			pins = "gpio16", "gpio17";
-			function = "blsp_uart0";
-			bias-disable;
-		};
-	};
-
-	spi_0_pins: spi_0_pinmux {
-		pin {
-			function = "blsp_spi0";
-			pins = "gpio12", "gpio13", "gpio14", "gpio15";
-			drive-strength = <12>;
-			bias-disable;
-		};
-	};
-
-	mdio_pins: mdio_pinmux {
-		mux_1 {
-			pins = "gpio6";
-			function = "mdio";
-			bias-pull-up;
-		};
-		mux_2 {
-			pins = "gpio7";  
-			function = "mdc";
-			bias-pull-up;
-		};
-	};
-
-	// Optimized WiFi GPIO configuration from GPL source analysis
-	wifi_pins: wifi_pinmux {
-		// WiFi priority GPIO for coexistence
-		pinmux_1 {
-			pins = "gpio42";
-			function = "gpio";
-			drive-strength = <8>;
-			bias-pull-up;
-			output-high;
-		};
-
-		// WiFi coexistence interface
-		pinmux_2 {
-			pins = "gpio43"; 
-			function = "wifi_wci1";
-			drive-strength = <6>;
-			bias-pull-up;
-		};
-
-		// Additional WiFi control GPIO
-		pinmux_3 {
-			pins = "gpio37";
-			function = "wcss0_dbg16";
-			drive-strength = <6>;
-			bias-pull-up;
-			output-high;
-		};
-	};
+// TODO: check if needed
+&cryptobam {
+    status = "okay";
 };
-
+// TODO: check if corrrect
 &blsp_dma {
 	status = "okay";
 };
 
-&blsp1_uart1 {
-	pinctrl-0 = <&serial_pins>;
-	pinctrl-names = "default";
-	status = "okay";
-};
 
-&blsp1_spi1 {
-	pinctrl-0 = <&spi_0_pins>;
-	pinctrl-names = "default";
-	status = "okay";
-	cs-gpios = <&tlmm 12 GPIO_ACTIVE_HIGH>;
-
-	flash0: flash@0 {
-		compatible = "jedec,spi-nor";
-		reg = <0>;
-		// Optimized frequency for XM25QH256B - verified from datasheet
-		spi-max-frequency = <50000000>;
-
-		partitions {
-			compatible = "fixed-partitions";
-			#address-cells = <1>;
-			#size-cells = <1>;
-
-			// Critical partitions - NEVER MODIFY (validated from stock firmware)
-			partition@0 {
-				label = "SBL1";
-				reg = <0x000000 0x030000>;
-				read-only;
-			};
-
-			partition@30000 {
-				label = "BOOTCONFIG";
-				reg = <0x030000 0x010000>;
-				read-only;
-			};
-
-			partition@40000 {
-				label = "MIBIB"; 
-				reg = <0x040000 0x010000>;
-				read-only;
-			};
-
-			partition@50000 {
-				label = "BOOTCONFIG1";
-				reg = <0x050000 0x010000>;
-				read-only;
-			};
-
-			partition@60000 {
-				label = "QSEE";
-				reg = <0x060000 0x060000>;
-				read-only;
-			};
-
-			partition@c0000 {
-				label = "CDT";
-				reg = <0x0c0000 0x010000>;
-				read-only;
-			};
-
-			partition@d0000 {
-				label = "DDRPARAMS";
-				reg = <0x0d0000 0x010000>;
-				read-only;
-			};
-
-			partition@e0000 {
-				label = "uboot-env";
-				reg = <0x0e0000 0x010000>;
-			};
-
-			partition@f0000 {
-				label = "u-boot";
-				reg = <0x0f0000 0x080000>;
-				read-only;
-			};
-
-			// ART partition with calibration data
-			art: partition@170000 {
-				label = "art";
-				reg = <0x170000 0x010000>;
-				read-only;
-
-				nvmem-layout {
-					compatible = "fixed-layout";
-					#address-cells = <1>;
-					#size-cells = <1>;
-
-					macaddr_art_0: macaddr@0 {
-						compatible = "mac-base";
-						reg = <0x0 0x6>;
-						#nvmem-cell-cells = <1>;
-					};
-
-					// WiFi calibration data validated from extracted ART
-					precal_art_1000: precal@1000 {
-						reg = <0x1000 0x2f20>;
-					};
-
-					precal_art_5000: precal@5000 {
-						reg = <0x5000 0x2f20>;
-					};
-				};
-			};
-
-			// Configuration partitions - maintain stock layout
-			partition@180000 {
-				label = "default-mac";
-				reg = <0x180000 0x001000>;
-				read-only;
-			};
-
-			partition@181000 {
-				label = "device-id";  
-				reg = <0x181000 0x001000>;
-				read-only;
-			};
-
-			partition@182000 {
-				label = "product-info";
-				reg = <0x182000 0x006000>;
-				read-only;
-			};
-
-			partition@190000 {
-				label = "support-list";
-				reg = <0x190000 0x010000>;
-				read-only;
-			};
-
-			partition@200000 {
-				label = "user-config";
-				reg = <0x200000 0x010000>;
-				read-only;
-			};
-
-			partition@210000 {
-				label = "device-config";
-				reg = <0x210000 0x010000>;
-				read-only;
-			};
-
-			partition@220000 {
-				label = "group-info";
-				reg = <0x220000 0x010000>;
-				read-only;
-			};
-
-			partition@230000 {
-				label = "partition-table0";
-				reg = <0x230000 0x002000>;
-				read-only;
-			};
-
-			// SLOT 0 - Stock firmware (preserved for recovery)
-			partition@240000 {
-				label = "os-image0";
-				reg = <0x240000 0x320000>;
-				read-only;
-			};
-
-			partition@560000 {
-				label = "file-system0";
-				reg = <0x560000 0xa00000>;
-				read-only;
-			};
-
-			partition@f60000 {
-				label = "soft-version0";
-				reg = <0xf60000 0x010000>;
-				read-only;
-			};
-
-			partition@f70000 {
-				label = "profile0";
-				reg = <0xf70000 0x010000>;
-				read-only;
-			};
-
-			partition@f80000 {
-				label = "default-config0";
-				reg = <0xf80000 0x010000>;
-				read-only;
-			};
-
-			partition@f90000 {
-				label = "partition-table1";
-				reg = <0xf90000 0x002000>;
-				read-only;
-			};
-
-			partition@fa0000 {
-				label = "fs-uboot1";
-				reg = <0xfa0000 0x080000>;
-				read-only;
-			};
-
-			// CRITICAL: Combined firmware partition for OpenWrt (15.625MB)
-			// MTD splitter will automatically separate kernel/rootfs
-			partition@1020000 {
-				label = "firmware";
-				reg = <0x1020000 0xfa0000>;
-				compatible = "tplink,firmware";
-			};
-
-			// Slot 1 metadata partitions
-			partition@1fc0000 {
-				label = "soft-version1";
-				reg = <0x1fc0000 0x010000>;
-			};
-
-			partition@1fd0000 {
-				label = "profile1";
-				reg = <0x1fd0000 0x010000>;
-			};
-
-			partition@1fe0000 {
-				label = "default-config1";
-				reg = <0x1fe0000 0x010000>;
-			};
-
-			partition@1ff0000 {
-				label = "url-sig";
-				reg = <0x1ff0000 0x010000>;
-			};
-		};
-	};
-};
 
 // Hardware crypto acceleration
 &crypto {
 	status = "okay";
 };
 
-&cryptobam {
-	status = "okay";
-};
 
 &prng {
 	status = "okay";
 };
 
-// Gigabit Ethernet with DSA
+
+&gmac0 {
+    status = "okay";
+    phy-mode = "rgmii";
+    qcom,id = <0>;
+    nvmem-cells = <&macaddr_art_0>;
+    nvmem-cell-names = "mac-address";
+
+    pinctrl-0 = <&rgmii_pins>;
+    pinctrl-names = "default";
+
+    fixed-link {
+        speed = <1000>;
+        full-duplex;
+    };
+};
+
+&gmac1 {
+    status = "okay";
+    phy-mode = "rgmii";
+    qcom,id = <1>;
+    nvmem-cells = <&macaddr_art_6>;
+    nvmem-cell-names = "mac-address";
+
+    pinctrl-0 = <&rgmii_pins>;
+    pinctrl-names = "default";
+
+    fixed-link {
+        speed = <1000>;
+        full-duplex;
+    };
+};
+
+&switch {
+    status = "okay";
+};
+
+/* &swport4 { TODO: check */
+
+&swport1 {
+    status = "okay";
+    label = "lan";
+  	/*  nvmem-cell-names = "mac-address"; TODO: check */
+  	/* nvmem-cells = <&macaddr_art_0 0>; */
+
+};
+
+/* &swport5 { TODO:check */
+&swport2 {
+    status = "okay";
+    label = "wan";
+	  /*  nvmem-cell-names = "mac-address"; TODO: check */
+	  /* nvmem-cells = <&macaddr_art_0 1>; */
+
+};
+
+&tlmm {
+    rgmii_pins: rgmii_pinmux { // TODO: check 
+        mux {
+            pins = "gpio68", "gpio69";
+            function = "rgmii";
+            bias-disable;
+        };
+    };
+
+    serial_pins: serial_pinmux {
+        mux {
+            pins = "gpio60", "gpio61";
+            /* pins = "gpio16", "gpio17"; TODO:check */
+
+            function = "blsp_uart0";
+            bias-disable;
+        };
+    };
+
+// TODO: check 
+    mdio_pins: mdio_pinmux { TODO:check
+        mux_1 {
+          pins = "gpio6";
+          function = "mdio";
+          bias-pull-up;
+        };
+        mux_2 {
+          pins = "gpio7";  
+          function = "mdc";
+          bias-pull-up;
+        };
+      };
+
+    wifi_pins: wifi_pinmux { TODO: check
+        // WiFi priority GPIO for coexistence
+        pinmux_1 {
+          pins = "gpio42";
+          function = "gpio";
+          drive-strength = <8>;
+          bias-pull-up;
+          output-high;
+        };
+
+        // WiFi coexistence interface
+        pinmux_2 {
+          pins = "gpio43"; 
+          function = "wifi_wci1";
+          drive-strength = <6>;
+          bias-pull-up;
+        };
+
+        // Additional WiFi control GPIO
+        pinmux_3 {
+          pins = "gpio37";
+          function = "wcss0_dbg16";
+          drive-strength = <6>;
+          bias-pull-up;
+          output-high;
+        };
+      };
+// TODO: check  until
+
+
+    spi_0_pins: spi_0_pinmux {
+        pin {
+            pins = "gpio55", "gpio56", "gpio57";
+            /* pins = "gpio12", "gpio13", "gpio14", "gpio15"; TODO:check */
+            /* drive-strength = <12>; */
+
+
+            function = "blsp_spi0";
+            bias-disable;
+        };
+
+        pin_cs {
+            pins = "gpio54", "gpio59";
+            function = "gpio";
+            bias-disable;
+            output-high;
+        };
+    };
+};
+
+&usb2_hs_phy {
+    status = "okay";
+    /* status = "disabled"; TODO: check */
+};
+
+&usb2 {
+    status = "okay";
+    /* status = "disabled"; TODO: check */
+
+};
+
+&wifi0 {
+    status = "okay";
+    nvmem-cells = <&precal_art_1000>;
+    nvmem-cell-names = "pre-calibration";
+    qcom,ath10k-calibration-variant = "tplink-deco-m4r-v3";
+
+    // TODO: check
+    pinctrl-0 = <&wifi_pins>;
+    pinctrl-names = "default";
+    nvmem-cell-names = "pre-calibration", "mac-address";
+    nvmem-cells = <&precal_art_1000>, <&macaddr_art_0 2>;
+    // Enable coexistence features from GPL source
+    qcom,coexist-support = <1>;
+    qcom,coexist-gpio = <42>;
+
+    // Optimize for 2.4GHz performance  
+    ieee80211-freq-limit = <2402000 2482000>;
+    // TODO: check until
+
+};
+
+&wifi1 {
+    status = "okay";
+    nvmem-cells = <&precal_art_5000>;
+    nvmem-cell-names = "pre-calibration";
+    qcom,ath10k-calibration-variant = "tplink-deco-m4r-v3";
+
+    // TODO: check
+  	nvmem-cell-names = "pre-calibration", "mac-address";
+  	nvmem-cells = <&precal_art_5000>, <&macaddr_art_0 3>;
+  	// Optimize for 5GHz performance
+  	ieee80211-freq-limit = <5170000 5835000>;
+    // TODO: check until 
+
+
+};
+
+// Gigabit Ethernet with DSA TODO: check
 &mdio {
 	status = "okay";
 	pinctrl-0 = <&mdio_pins>;
@@ -419,77 +604,28 @@
 	reset-gpios = <&tlmm 47 GPIO_ACTIVE_LOW>;
 	reset-delay-us = <2000>;
 };
-
+// TODO: check
 &watchdog {
 	status = "okay";
 };
 
+// TODO: check
 &gmac {
 	status = "okay";
 };
-
-&switch {
-	status = "okay";
-};
-
-&swport4 {
-	status = "okay";
-	label = "lan";
-	nvmem-cell-names = "mac-address";
-	nvmem-cells = <&macaddr_art_0 0>;
-};
-
-&swport5 {
-	status = "okay";
-	label = "wan";
-	nvmem-cell-names = "mac-address";
-	nvmem-cells = <&macaddr_art_0 1>;
-};
-
-// WiFi configuration optimized for mesh
-&wifi0 {
-	status = "okay";
-	pinctrl-0 = <&wifi_pins>;
-	pinctrl-names = "default";
-	nvmem-cell-names = "pre-calibration", "mac-address";
-	nvmem-cells = <&precal_art_1000>, <&macaddr_art_0 2>;
-	qcom,ath10k-calibration-variant = "tplink,deco-m4r-v3";
-	
-	// Enable coexistence features from GPL source
-	qcom,coexist-support = <1>;
-	qcom,coexist-gpio = <42>;
-	
-	// Optimize for 2.4GHz performance  
-	ieee80211-freq-limit = <2402000 2482000>;
-};
-
-&wifi1 {
-	status = "okay";
-	nvmem-cell-names = "pre-calibration", "mac-address";
-	nvmem-cells = <&precal_art_5000>, <&macaddr_art_0 3>;
-	qcom,ath10k-calibration-variant = "tplink,deco-m4r-v3";
-	
-	// Optimize for 5GHz performance
-	ieee80211-freq-limit = <5170000 5835000>;
-};
-
+// TODO: check
 // Disable USB - no physical ports, saves power and space
-&usb2 {
-	status = "disabled";
-};
-
-&usb2_hs_phy {
-	status = "disabled";
-};
-
 &usb3 {
 	status = "disabled";
 };
 
+// TODO: check
 &usb3_hs_phy {
 	status = "disabled";
 };
 
+// TODO: check
 &usb3_ss_phy {
 	status = "disabled";
 };
+

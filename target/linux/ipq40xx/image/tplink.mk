@@ -33,6 +33,18 @@ define Device/tplink-deco-m4r-v3-common
 	# Maximum compression for U-Boot 2012.07 compatibility
 	KERNEL := kernel-bin | append-dtb | lzma | uImage lzma
 	FILESYSTEMS := squashfs
+
+	# KERNEL := kernel-bin | append-dtb | uImage gzip TODO: check again
+	#  KERNEL_INITRAMFS := kernel-bin | append-dtb | uImage gzip
+	#
+	#  IMAGE/factory.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-rootfs | pad-rootfs | \
+	#                      tplink-safeloader factory | check-size
+	#  IMAGE/sysupgrade.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-rootfs | pad-rootfs | \
+	#                         tplink-safeloader sysupgrade | append-metadata
+	#
+	#  KERNEL_SIZE := 4096k
+	#  SUPPORTED_DEVICES += deco-m4r-v3
+
 endef
 
 # Profile 1: Basic Mesh - Stock firmware feature parity
@@ -118,6 +130,28 @@ define Device/tplink_deco-m4r-v3-enhanced
 		prometheus-node-exporter-lua-wifi_stations \
 		luci-app-statistics
 
+	# DEVICE_PACKAGES := ipq-wifi-tplink_deco-m4r-v3 \ TODO: check again
+  #                   hostapd-common wpad-mesh-mbedtls \
+  #                   kmod-batman-adv batctl-full \
+  #                   mesh11sd dawn luci-app-dawn \
+  #                   luci-app-batman-adv \
+  #                   irqbalance sqm-scripts luci-app-sqm \
+  #                   luci-app-vnstat2 luci-app-nlbwmon \
+  #                   luci-app-statistics luci-app-advanced-reboot \
+  #                   collectd-mod-cpu collectd-mod-memory \
+  #                   collectd-mod-network collectd-mod-load \
+  #                   htop iperf3 tcpdump-mini \
+  #                   kmod-8021q bridge-utils vconfig
+
 endef
 TARGET_DEVICES += tplink_deco-m4r-v3-enhanced
+
+  # $(call Device/FitImageGzip)
+	#   $(call Device/FitImageGzip)
+
+
+
+# Generate WiFi calibration package TODO: check if needed
+# $(eval $(call generate-ipq-wifi-package,tplink_deco-m4r-v3,TP-Link Deco M4R v3))
+
 
