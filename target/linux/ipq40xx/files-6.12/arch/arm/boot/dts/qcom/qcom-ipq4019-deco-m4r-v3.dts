@@ -17,16 +17,15 @@
 		led-failsafe = &led_power_red;
 		led-running = &led_power_green;
 		led-upgrade = &led_power_blue;
-		label-mac-device = &gmac0;
 		serial0 = &blsp1_uart1;
 		ethernet0 = &gmac0;
 		ethernet1 = &gmac1;
+		label-mac-device = &gmac0;
 	};
 
 	chosen {
 		stdout-path = "serial0:115200n8";
 		bootargs-append = " swiotlb=1 coherent_pool=2M";
-    /* bootargs-append = " rcu_nocbs=0-3 isolcpus=3 quiet loglevel=4"; */
 	};
 
 	memory {
@@ -53,9 +52,9 @@
 		pinctrl-names = "default";
 
 		led_power_red: power_red {
-			label = "red:power";
 			color = <LED_COLOR_ID_RED>;
-			function = LED_FUNCTION_POWER;
+      label = "red:status";
+      function = LED_FUNCTION_STATUS;
 			gpios = <&tlmm 28 GPIO_ACTIVE_LOW>;
 		};
 
@@ -67,11 +66,9 @@
 		};
 
 		led_power_blue: power_blue {
-			label = "blue:power";
-			color = <LED_COLOR_ID_BLUE>;
-			function = LED_FUNCTION_POWER;
-      /* function = LED_FUNCTION_STATUS; */
-      /* function = LED_FUNCTION_WPS; */
+			label = "blue:indicator"; 
+      color = <LED_COLOR_ID_BLUE>;
+			function = LED_FUNCTION_INDICATOR;
 			gpios = <&tlmm 35 GPIO_ACTIVE_LOW>;
 		};
 	};
@@ -86,14 +83,6 @@
 		};
 
 		watchdog@b017000 {
-			status = "okay";
-		};
-
-		ess-switch@c000000 {
-			status = "okay";
-		};
-
-		edma@c080000 {
 			status = "okay";
 		};
 
@@ -124,6 +113,33 @@
 			compatible = "qcom,tcsr";
 			reg = <0x1953000 0x1000>;
 			qcom,ess-interface-select = <TCSR_ESS_PSGMII>;
+		};
+
+		// EDMA ethernet controller
+		edma@c080000 {
+			status = "okay";
+		};
+
+		// ESS switch
+		ess-switch@c000000 {
+			status = "okay";
+		};
+
+		// MDIO bus
+		mdio@90000 {
+			status = "okay";
+			pinctrl-0 = <&mdio_pins>;
+			pinctrl-names = "default";
+			reset-gpios = <&tlmm 47 GPIO_ACTIVE_LOW>;
+			reset-delay-us = <2000>;
+
+			ethphy3: ethernet-phy@3 {
+				reg = <3>;
+			};
+
+			ethphy4: ethernet-phy@4 {
+				reg = <4>;
+			};
 		};
 	};
 };
@@ -192,6 +208,14 @@
 			function = "gpio";
 			bias-pull-up;
 			drive-strength = <6>;
+		};
+	};
+
+	mdio_pins: mdio_pinmux {
+		mux {
+			pins = "gpio6", "gpio7";
+			function = "mdio";
+			bias-pull-up;
 		};
 	};
 };
@@ -438,7 +462,7 @@
 	status = "okay";
 };
 
-/* Dual Ethernet Configuration via QCA8072 DSA */
+/* Dual Ethernet Configuration via Linux 6.12 DSA */
 &gmac0 {
 	status = "okay";
 	phy-mode = "psgmii";
@@ -490,13 +514,13 @@
 		port@3 {
 			reg = <3>;
 			label = "lan1";
-			phy-handle = <&phy3>;
+			phy-handle = <&ethphy3>;
 		};
 
 		port@4 {
 			reg = <4>;
 			label = "lan2";
-			phy-handle = <&phy4>;
+			phy-handle = <&ethphy4>;
 		};
 	};
 	
@@ -512,22 +536,6 @@
 			reg = <4>;
 		};
 	};
-};
-
-&swport3 {
-	status = "okay";
-	label = "lan1";
-	
-	nvmem-cell-names = "mac-address";
-	nvmem-cells = <&macaddr_art_0 1>;
-};
-
-&swport4 {
-	status = "okay";
-	label = "lan2";
-	
-	nvmem-cell-names = "mac-address";
-	nvmem-cells = <&macaddr_art_0 2>;
 };
 
 &wifi0 {

@@ -1,5 +1,6 @@
 BOARDNAME := TP-Link Devices
-FEATURES += minor tplink low_mem
+# FEATURES += minor tplink low_mem
+FEATURES += minor tplink
 
 DEFAULT_PACKAGES += kmod-crypto-hw-qce kmod-crypto-aes-arm-bs kmod-cryptodev \
 										kmod-crypto-sha1-arm-neon kmod-crypto-sha256-arm \
@@ -19,8 +20,8 @@ DEFAULT_PACKAGES += kmod-crypto-hw-qce kmod-crypto-aes-arm-bs kmod-cryptodev \
 										luci-app-firewall luci-app-sqm luci-app-irqbalance luci-app-dawn \
 										luci-app-advanced-reboot luci-app-attendedsysupgrade luci-app-opkg \
 										luci-app-statistics btop luci-app-vnstat2 luci-app-nlbwmon luci-proto-ppp \
-										luci-i18n-base-en ip6tables kmod-ip6-vti bind-dig luci-app-commands \
-										vlandev kmod-bonding
+										luci-i18n-base-en ip6tables kmod-ip6-vti luci-app-commands \
+										vlandev kmod-bonding luci
 
 # DEFAULT_PACKAGES += -kmod-slhc -wpad-basic-mbedtls -dnsmasq -ath10k-firmware-qca4019-ct \
 # 										-kmod-ath10k-ct -swconfig, -kmod-swconfig
