@@ -1,0 +1,22 @@
+#!/bin/sh
+
+. /lib/functions/system.sh
+
+# Generate dynamic hostname from MAC address last 4 digits
+get_dynamic_hostname() {
+    local macaddr=$(cat /sys/class/net/eth0/address 2>/dev/null)
+    if [ -n "$macaddr" ]; then
+        local mac_suffix=$(echo "$macaddr" | tr -d ':' | tail -c 5)
+        echo "deco-m4r-v3-${mac_suffix}"
+    else
+        echo "deco-m4r-v3"
+    fi
+}
+
+# Set dynamic hostname
+hostname=$(get_dynamic_hostname)
+uci set system.@system[0].hostname="$hostname"
+uci commit system
+
+exit 0
+
